@@ -5,6 +5,10 @@ import com.gestao.service.UsuarioService;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.security.Keys;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -17,6 +21,7 @@ import java.util.Map;
 @RestController
 @RequestMapping("/api/auth")
 @CrossOrigin(origins = {"http://localhost:3000", "http://localhost:3001", "http://localhost:3003"})
+@Tag(name = "Autenticação", description = "Endpoints de autenticação e registro de usuários")
 public class AuthController {
 
     @Autowired
@@ -25,6 +30,12 @@ public class AuthController {
     private final String secretKey = "my-super-secret-key-1234567890ABCDEF";
 
     @PostMapping("/login")
+    @Operation(summary = "Realiza login do usuário", description = "Autentica o usuário e retorna um token JWT")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Login realizado com sucesso"),
+            @ApiResponse(responseCode = "400", description = "Credenciais inválidas ou incompletas"),
+            @ApiResponse(responseCode = "401", description = "Usuário ou senha incorretos")
+    })
     public ResponseEntity<?> login(@RequestBody Map<String, String> credentials) {
         String username = credentials.get("username");
         String password = credentials.get("password");
@@ -59,17 +70,29 @@ public class AuthController {
     }
 
     @PostMapping("/register")
+    @Operation(summary = "Registra um novo usuário", description = "Cria um novo usuário no sistema")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Usuário registrado com sucesso"),
+            @ApiResponse(responseCode = "400", description = "Dados inválidos")
+    })
     public ResponseEntity<?> register(@RequestBody Usuario usuario) {
         Usuario saved = usuarioService.save(usuario);
         return ResponseEntity.ok(saved);
     }
 
     @PostMapping("/logout")
+    @Operation(summary = "Realiza logout do usuário", description = "Finaliza a sessão do usuário")
+    @ApiResponse(responseCode = "200", description = "Logout realizado com sucesso")
     public ResponseEntity<?> logout() {
         return ResponseEntity.ok("Logout realizado");
     }
 
     @GetMapping("/profile")
+    @Operation(summary = "Obtém o perfil do usuário", description = "Retorna as informações do perfil do usuário autenticado")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Perfil obtido com sucesso"),
+            @ApiResponse(responseCode = "401", description = "Não autenticado")
+    })
     public ResponseEntity<?> profile(@RequestHeader("Authorization") String token) {
         return ResponseEntity.ok("Perfil do usuário");
     }
