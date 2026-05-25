@@ -23,8 +23,8 @@ public class UsuarioService {
         return repository.save(usuario);
     }
 
-    public Usuario findByUsername(String username) {
-        return repository.findByUsername(username);
+    public Usuario findByEmail(String email) {
+        return repository.findByEmail(email);
     }
 
     public boolean validatePassword(String rawPassword, String encodedPassword) {
