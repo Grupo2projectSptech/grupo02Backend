@@ -34,23 +34,23 @@ public class AuthController {
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Login realizado com sucesso"),
             @ApiResponse(responseCode = "400", description = "Credenciais inválidas ou incompletas"),
-            @ApiResponse(responseCode = "401", description = "Usuário ou senha incorretos")
+            @ApiResponse(responseCode = "401", description = "Email ou senha incorretos")
     })
     public ResponseEntity<?> login(@RequestBody Map<String, String> credentials) {
-        String username = credentials.get("username");
+        String email = credentials.get("email");
         String password = credentials.get("password");
 
-        if (username == null || password == null) {
-            return ResponseEntity.badRequest().body("Username e password são obrigatórios");
+        if (email == null || password == null) {
+            return ResponseEntity.badRequest().body("email e password são obrigatórios");
         }
 
-        Usuario usuario = usuarioService.findByUsername(username);
+        Usuario usuario = usuarioService.findByEmail(email);
         if (usuario == null || !usuarioService.validatePassword(password, usuario.getPassword())) {
             return ResponseEntity.status(401).body("Credenciais inválidas");
         }
 
         String token = Jwts.builder()
-                .setSubject(username)
+                .setSubject(email)
                 .claim("id", usuario.getId())
                 .claim("name", usuario.getName())
                 .claim("role", usuario.getRole())
@@ -63,7 +63,7 @@ public class AuthController {
         response.put("token", token);
         response.put("id", usuario.getId());
         response.put("name", usuario.getName());
-        response.put("username", usuario.getUsername());
+        response.put("username", usuario.getEmail());
         response.put("role", usuario.getRole());
 
         return ResponseEntity.ok(response);

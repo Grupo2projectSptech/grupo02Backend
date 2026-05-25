@@ -15,10 +15,10 @@ public class DataLoader {
         return args -> {
             BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
 
-            if (repository.findByUsername("admin") == null) {
+            if (repository.findByEmail("admin") == null) {
                 repository.save(new Usuario(null, "Administrador", "admin", encoder.encode("admin123"), "ADMIN"));
             }
-            if (repository.findByUsername("gerente") == null) {
+            if (repository.findByEmail("gerente") == null) {
                 repository.save(new Usuario(null, "Gerente", "gerente", encoder.encode("gerente123"), "GERENTE"));
             }
         };
