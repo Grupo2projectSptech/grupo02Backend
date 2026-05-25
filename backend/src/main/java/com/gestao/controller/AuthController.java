@@ -1,5 +1,6 @@
 package com.gestao.controller;
 
+import com.fasterxml.jackson.databind.introspect.AnnotatedAndMetadata;
 import com.gestao.model.Usuario;
 import com.gestao.service.UsuarioService;
 import io.jsonwebtoken.Jwts;
@@ -22,7 +23,7 @@ import java.util.Map;
 @RequestMapping("/api/auth")
 @CrossOrigin(origins = {"http://localhost:3000", "http://localhost:3001", "http://localhost:3003"})
 @Tag(name = "Autenticação", description = "Endpoints de autenticação e registro de usuários")
-public class AuthController {
+public class AuthController<UsuarioTokenDto> {
 
     @Autowired
     private UsuarioService usuarioService;

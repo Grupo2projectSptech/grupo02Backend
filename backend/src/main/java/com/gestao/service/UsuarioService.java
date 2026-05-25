@@ -30,4 +30,8 @@ public class UsuarioService {
     public boolean validatePassword(String rawPassword, String encodedPassword) {
         return encoder.matches(rawPassword, encodedPassword);
     }
+
+    public <UsuarioTokenDto> UsuarioTokenDto autenticar(Usuario usuario) {
+        return null;
+    }
 }
