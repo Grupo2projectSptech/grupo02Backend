@@ -21,7 +21,7 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/api/auth")
-@CrossOrigin(origins = {"http://localhost:3000", "http://localhost:3001", "http://localhost:3003"})
+@CrossOrigin(origins = {"http://localhost:3000", "http://localhost:3001", "http://localhost:3003", "http://localhost:5173"})
 @Tag(name = "Autenticação", description = "Endpoints de autenticação e registro de usuários")
 public class AuthController<UsuarioTokenDto> {
 
