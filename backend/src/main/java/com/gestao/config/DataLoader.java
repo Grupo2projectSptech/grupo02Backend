@@ -15,11 +15,13 @@ public class DataLoader {
         return args -> {
             BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
 
-            if (repository.findByEmail("admin") == null) {
-                repository.save(new Usuario(null, "Administrador", "admin", encoder.encode("admin123"), "ADMIN"));
+            if (!repository.existsByEmail("admin@outletparty.com")) {
+                repository.save(new Usuario(null, "Administrador", "admin@outletparty.com",
+                        encoder.encode("admin123"), "ADMIN"));
             }
-            if (repository.findByEmail("gerente") == null) {
-                repository.save(new Usuario(null, "Gerente", "gerente", encoder.encode("gerente123"), "GERENTE"));
+            if (!repository.existsByEmail("gerente@outletparty.com")) {
+                repository.save(new Usuario(null, "Gerente", "gerente@outletparty.com",
+                        encoder.encode("gerente123"), "GERENTE"));
             }
         };
     }

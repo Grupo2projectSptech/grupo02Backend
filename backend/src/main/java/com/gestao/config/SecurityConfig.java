@@ -14,19 +14,25 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
-                // Nova forma de desabilitar o CSRF
-                .csrf(csrf -> csrf.disable())
-
-                // Nova forma de configurar as permissões de requisição
-                .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/api/auth/**").permitAll()
-                        .anyRequest().authenticated() // Alterado para 'authenticated' para exigir o token
-                )
-
-                // Define que a sessão não armazenará estado (comum em APIs com JWT)
-                .sessionManagement(session -> session
-                        .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
-                );
+            .csrf(csrf -> csrf.disable())
+            .authorizeHttpRequests(auth -> auth
+                // Autenticação, Swagger e H2-console sem token
+                .requestMatchers(
+                    "/api/auth/**",
+                    "/swagger-ui/**",
+                    "/swagger-ui.html",
+                    "/api-docs/**",
+                    "/h2-console/**"
+                ).permitAll()
+                // Todo o restante exige autenticação — mas como não há filtro JWT embutido,
+                // permitimos por enquanto para não quebrar o front enquanto não implementamos o filtro.
+                .anyRequest().permitAll()
+            )
+            .sessionManagement(session -> session
+                .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+            )
+            // Necessário para H2 console (usa frames)
+            .headers(h -> h.frameOptions(fo -> fo.disable()));
 
         return http.build();
     }

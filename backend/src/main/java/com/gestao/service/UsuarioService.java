@@ -1,5 +1,7 @@
 package com.gestao.service;
 
+import com.gestao.dto.RegisterRequestDTO;
+import com.gestao.exception.BusinessException;
 import com.gestao.model.Usuario;
 import com.gestao.repository.UsuarioRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,11 +17,24 @@ public class UsuarioService {
     @Autowired
     public UsuarioService(UsuarioRepository repository) {
         this.repository = repository;
-        this.encoder = new BCryptPasswordEncoder();
+        this.encoder    = new BCryptPasswordEncoder();
     }
 
-    public Usuario save(Usuario usuario) {
-        usuario.setPassword(encoder.encode(usuario.getPassword()));
+    /**
+     * Registra novo usuário a partir do DTO validado.
+     * Lança BusinessException se o e-mail já estiver em uso.
+     */
+    public Usuario register(RegisterRequestDTO dto) {
+        if (repository.existsByEmail(dto.getEmail())) {
+            throw new BusinessException("E-mail já cadastrado: " + dto.getEmail());
+        }
+
+        Usuario usuario = new Usuario();
+        usuario.setName(dto.getName());
+        usuario.setEmail(dto.getEmail());
+        usuario.setPassword(encoder.encode(dto.getPassword()));
+        usuario.setRole(dto.getRole() != null ? dto.getRole().toUpperCase() : "USER");
+
         return repository.save(usuario);
     }
 
@@ -29,9 +44,5 @@ public class UsuarioService {
 
     public boolean validatePassword(String rawPassword, String encodedPassword) {
         return encoder.matches(rawPassword, encodedPassword);
-    }
-
-    public <UsuarioTokenDto> UsuarioTokenDto autenticar(Usuario usuario) {
-        return null;
     }
 }
