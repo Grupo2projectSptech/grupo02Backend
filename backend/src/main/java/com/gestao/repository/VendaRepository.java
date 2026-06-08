@@ -9,5 +9,8 @@ import java.util.List;
 public interface VendaRepository extends JpaRepository<Venda, Long> {
     List<Venda> findByDataBetween(LocalDate inicio, LocalDate fim);
     List<Venda> findByTipo(String tipo);
+<<<<<<< HEAD
     List<Venda> findByNomeProdutoContainingIgnoreCase(String nomeProduto);
+=======
+>>>>>>> 605613bc96c70ce98af6cc7a02dc9786f2984173
 }

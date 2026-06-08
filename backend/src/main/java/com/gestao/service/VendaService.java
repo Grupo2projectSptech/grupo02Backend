@@ -2,13 +2,20 @@ package com.gestao.service;
 
 import com.gestao.exception.ResourceNotFoundException;
 import com.gestao.model.Venda;
+<<<<<<< HEAD
+=======
+import com.gestao.observer.VendaEventPublisher;
+>>>>>>> 605613bc96c70ce98af6cc7a02dc9786f2984173
 import com.gestao.repository.VendaRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+<<<<<<< HEAD
 import java.time.LocalDate;
+=======
+>>>>>>> 605613bc96c70ce98af6cc7a02dc9786f2984173
 import java.util.List;
 
 @Service
@@ -17,6 +24,12 @@ public class VendaService {
     @Autowired
     private VendaRepository repository;
 
+<<<<<<< HEAD
+=======
+    @Autowired
+    private VendaEventPublisher eventPublisher;   // ← Publisher injetado
+
+>>>>>>> 605613bc96c70ce98af6cc7a02dc9786f2984173
     public List<Venda> findAll() {
         return repository.findAll();
     }
@@ -26,6 +39,7 @@ public class VendaService {
                 .orElseThrow(() -> new ResourceNotFoundException("Venda não encontrada com id: " + id));
     }
 
+<<<<<<< HEAD
     public List<Venda> findByPeriodo(LocalDate inicio, LocalDate fim) {
         return repository.findByDataBetween(inicio, fim);
     }
@@ -60,6 +74,20 @@ public class VendaService {
         venda.setOperacional(data.getOperacional());
         calcularCampos(venda);
         return repository.save(venda);
+=======
+    /**
+     * Persiste a venda, calcula os campos derivados e notifica os observers.
+     * Ordem: calcular → salvar → notificar (observers recebem a venda com id).
+     */
+    public Venda save(Venda venda) {
+        calcularCampos(venda);
+        Venda salva = repository.save(venda);
+
+        // ── Padrão Observer: notifica todos os observers registrados ──────────
+        eventPublisher.notificar(salva);
+
+        return salva;
+>>>>>>> 605613bc96c70ce98af6cc7a02dc9786f2984173
     }
 
     public void delete(Long id) {
@@ -69,10 +97,16 @@ public class VendaService {
         repository.deleteById(id);
     }
 
+<<<<<<< HEAD
     // ── Lógica de cálculo ────────────────────────────────────────────────────
 
     private void calcularCampos(Venda v) {
         BigDecimal qtd        = BigDecimal.valueOf(v.getQuantidade() != null ? v.getQuantidade() : 1);
+=======
+    // ── Lógica de cálculo espelhando o frontend ──────────────────────────────
+    private void calcularCampos(Venda v) {
+        BigDecimal qtd        = toBD(v.getQuantidade());
+>>>>>>> 605613bc96c70ce98af6cc7a02dc9786f2984173
         BigDecimal custoUn    = safe(v.getCustoUnidade());
         BigDecimal freteVenda = safe(v.getFreteVenda());
         BigDecimal freteFlex  = safe(v.getFreteFlex());
@@ -106,4 +140,11 @@ public class VendaService {
     private BigDecimal safe(BigDecimal v) {
         return v == null ? BigDecimal.ZERO : v;
     }
+<<<<<<< HEAD
+=======
+
+    private BigDecimal toBD(Integer v) {
+        return v == null ? BigDecimal.ZERO : BigDecimal.valueOf(v);
+    }
+>>>>>>> 605613bc96c70ce98af6cc7a02dc9786f2984173
 }

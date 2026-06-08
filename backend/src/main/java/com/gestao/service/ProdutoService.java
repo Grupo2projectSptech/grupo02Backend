@@ -16,9 +16,6 @@ public class ProdutoService {
     @Autowired
     private FornecedorService fornecedorService;
 
-    @Autowired
-    private EmpresaService empresaService;
-
     public List<Produto> findAll() {
         return repository.findAll();
     }
@@ -32,16 +29,9 @@ public class ProdutoService {
         return repository.findByFornecedorId(fornecedorId);
     }
 
-    public List<Produto> findByEmpresa(Long empresaId) {
-        return repository.findByEmpresaId(empresaId);
-    }
-
     public Produto save(Produto produto) {
         if (produto.getFornecedor() != null && produto.getFornecedor().getId() != null) {
             produto.setFornecedor(fornecedorService.findById(produto.getFornecedor().getId()));
-        }
-        if (produto.getEmpresa() != null && produto.getEmpresa().getId() != null) {
-            produto.setEmpresa(empresaService.findById(produto.getEmpresa().getId()));
         }
         return repository.save(produto);
     }
@@ -58,9 +48,6 @@ public class ProdutoService {
         produto.setAtivo(data.isAtivo());
         if (data.getFornecedor() != null && data.getFornecedor().getId() != null) {
             produto.setFornecedor(fornecedorService.findById(data.getFornecedor().getId()));
-        }
-        if (data.getEmpresa() != null && data.getEmpresa().getId() != null) {
-            produto.setEmpresa(empresaService.findById(data.getEmpresa().getId()));
         }
         return repository.save(produto);
     }

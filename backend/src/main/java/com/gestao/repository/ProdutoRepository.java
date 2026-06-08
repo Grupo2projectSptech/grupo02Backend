@@ -9,6 +9,5 @@ import java.util.List;
 public interface ProdutoRepository extends JpaRepository<Produto, Long> {
     List<Produto> findByAtivoTrue();
     List<Produto> findByFornecedorId(Long fornecedorId);
-    List<Produto> findByEmpresaId(Long empresaId);
     List<Produto> findByCategoria(String categoria);
 }

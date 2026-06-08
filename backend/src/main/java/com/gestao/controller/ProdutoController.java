@@ -48,16 +48,6 @@ public class ProdutoController {
         return ResponseEntity.ok(service.findByFornecedor(fornecedorId));
     }
 
-    @GetMapping("/empresa/{empresaId}")
-    @Operation(summary = "Lista produtos por empresa", description = "Retorna todos os produtos de uma empresa específica")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Lista de produtos obtida com sucesso"),
-            @ApiResponse(responseCode = "404", description = "Empresa não encontrada")
-    })
-    public ResponseEntity<List<Produto>> findByEmpresa(@PathVariable Long empresaId) {
-        return ResponseEntity.ok(service.findByEmpresa(empresaId));
-    }
-
     @PostMapping
     @Operation(summary = "Cria um novo produto", description = "Cadastra um novo produto no sistema")
     @ApiResponses(value = {
