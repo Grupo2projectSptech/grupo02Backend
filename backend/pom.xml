@@ -16,7 +16,6 @@
     <description>API de Gestao - Empresas, Fornecedores e Produtos</description>
 
     <properties>
-        <!-- Compatível com JDK 17, 21 e 23 -->
         <java.version>17</java.version>
         <maven.compiler.source>17</maven.compiler.source>
         <maven.compiler.target>17</maven.compiler.target>
@@ -66,16 +65,14 @@
             <scope>runtime</scope>
         </dependency>
 
-<<<<<<< HEAD
         <!-- Apache POI - leitura de arquivos Excel (.xlsx) -->
         <dependency>
             <groupId>org.apache.poi</groupId>
             <artifactId>poi-ooxml</artifactId>
             <version>5.3.0</version>
         </dependency>
-=======
-        <!-- Lombok — 1.18.36 corrige o bug TypeTag::UNKNOWN no JDK 21+ -->
->>>>>>> 605613bc96c70ce98af6cc7a02dc9786f2984173
+
+        <!-- Lombok -->
         <dependency>
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
@@ -112,7 +109,6 @@
                 </configuration>
             </plugin>
 
-            <!-- Garante que o maven-compiler-plugin use a versão correta -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
