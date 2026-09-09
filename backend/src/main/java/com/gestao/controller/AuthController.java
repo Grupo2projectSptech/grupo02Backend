@@ -4,6 +4,7 @@ import com.gestao.dto.AuthResponseDTO;
 import com.gestao.dto.LoginRequestDTO;
 import com.gestao.dto.RegisterRequestDTO;
 import com.gestao.model.Usuario;
+import com.gestao.service.LoginAttemptService;
 import com.gestao.service.UsuarioService;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
@@ -12,8 +13,10 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -32,6 +35,8 @@ public class AuthController {
     @Autowired
     private UsuarioService usuarioService;
 
+    @Autowired
+    private LoginAttemptService loginAttemptService;
     // Chave mínima de 32 chars para HS256
     private final String secretKey = "my-super-secret-key-1234567890AB";
 
@@ -44,12 +49,22 @@ public class AuthController {
         @ApiResponse(responseCode = "400", description = "Dados inválidos"),
         @ApiResponse(responseCode = "401", description = "Credenciais incorretas")
     })
-    public ResponseEntity<?> login(@Valid @RequestBody LoginRequestDTO dto) {
+
+
+    public ResponseEntity<?> login(@Valid @RequestBody LoginRequestDTO dto,  HttpServletRequest request) {
+        String clientIp = request.getRemoteAddr();
+
+        if (loginAttemptService.isblocked(clientIp)) {
+            return ResponseEntity.status(HttpStatus.TOO_MANY_REQUESTS)
+                    .body(buildError("Muitas tentativas falhas. Bloqueado temporariamente"));
+        }
         Usuario usuario = usuarioService.findByEmail(dto.getEmail());
 
         if (usuario == null || !usuarioService.validatePassword(dto.getPassword(), usuario.getPassword())) {
+            loginAttemptService.loginFailed(clientIp);
             return ResponseEntity.status(401).body(buildError("Credenciais inválidas"));
         }
+        loginAttemptService.loginSucceeded(clientIp);
 
         String token = buildToken(usuario);
 
