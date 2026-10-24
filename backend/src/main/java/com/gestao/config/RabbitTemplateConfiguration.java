@@ -19,33 +19,47 @@ public class RabbitTemplateConfiguration {
 
     private final ConnectionFactory connectionFactory;
 
-    @Value("${broker.exchange.name}")
-    private String exchangeName;
+    @Value("${broker.exchange.venda}")
+    private String exchangeVenda;
 
-    @Value("${broker.queue.name}")
-    private String queueName;
+    @Value("${broker.queue.estoque}")
+    private String queueEstoque;
+
+    @Value("{broker.queue.auditoria}")
+    private String queueAuditoria;
 
     @Bean
-    public FanoutExchange exchange() {
-        return new FanoutExchange(exchangeName);
+    public FanoutExchange vendaExchange() {
+        return new FanoutExchange(exchangeVenda);
     }
 
     @Bean
-    public Queue queue() {
-        return new Queue(queueName, true);
+    public Queue estoquequeue() {
+        return new Queue(queueEstoque, true);
     }
 
     @Bean
-    public Binding binding(Queue queue, FanoutExchange exchange) {
+    public Queue auditoriaqueue() {
+        return new Queue(queueAuditoria, true);
+    }
+
+    @Bean
+    public Binding bindingEstoque(Queue estoqueQueue, FanoutExchange vendaExchange) {
         return BindingBuilder
-                .bind(queue)
-                .to(exchange);
+                .bind(estoqueQueue)
+                .to(vendaExchange);
+    }
+
+    @Bean
+    public Binding bindingAuditoria(Queue auditoriaQueue, FanoutExchange vendaExchange) {return  BindingBuilder
+                .bind(auditoriaQueue)
+                .to(vendaExchange);
     }
 
     @Bean
     public RabbitTemplate rabbitTemplate() {
         RabbitTemplate rabbitTemplate = new RabbitTemplate(connectionFactory);
-        rabbitTemplate.setExchange(exchangeName);
+        rabbitTemplate.setExchange(exchangeVenda);
         rabbitTemplate.setMessageConverter(new Jackson2JsonMessageConverter());
         return rabbitTemplate;
     }
