@@ -1,12 +1,16 @@
 package com.gestao.config;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import org.springframework.amqp.core.Binding;
 import org.springframework.amqp.core.BindingBuilder;
 import org.springframework.amqp.core.FanoutExchange;
 import org.springframework.amqp.core.Queue;
+import org.springframework.amqp.rabbit.config.SimpleRabbitListenerContainerFactory;
 import org.springframework.amqp.rabbit.connection.ConnectionFactory;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.amqp.support.converter.Jackson2JsonMessageConverter;
+import org.springframework.amqp.support.converter.MessageConverter;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
@@ -36,12 +40,12 @@ public class RabbitTemplateConfiguration {
 
     @Bean
     public Queue estoqueQueue() {
-        return new Queue(queueEstoque, true);
+        return new Queue("venda.estoque.queue", true);
     }
 
     @Bean
     public Queue auditoriaQueue() {
-        return new Queue(queueAuditoria, true);
+        return new Queue("venda.auditoria.queue", true);
     }
 
     @Bean
@@ -57,6 +61,26 @@ public class RabbitTemplateConfiguration {
                 .to(vendaExchange);
     }
 
+
+
+    @Bean
+    public MessageConverter jsonMessageConverter() {
+        ObjectMapper objectMapper = new ObjectMapper();
+        objectMapper.registerModule(new JavaTimeModule()); // Essencial para datas no Java 8+
+        return new Jackson2JsonMessageConverter(objectMapper);
+    }
+
+    // 2. Configure a Factory do Listener para forçar o uso do conversor JSON
+    @Bean
+    public SimpleRabbitListenerContainerFactory rabbitListenerContainerFactory(
+            ConnectionFactory connectionFactory,
+            MessageConverter jsonMessageConverter) {
+
+        SimpleRabbitListenerContainerFactory factory = new SimpleRabbitListenerContainerFactory();
+        factory.setConnectionFactory(connectionFactory);
+        factory.setMessageConverter(jsonMessageConverter); // Define o conversor aqui!
+        return factory;
+    }
     @Bean
     public RabbitTemplate rabbitTemplate() {
         RabbitTemplate rabbitTemplate = new RabbitTemplate(connectionFactory);

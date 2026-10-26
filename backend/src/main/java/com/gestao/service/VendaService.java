@@ -20,7 +20,7 @@ import java.util.List;
 public class VendaService {
 
     @Autowired
-    private final VendaRepository repository;
+    private final VendaRepository vendaRepository;
 
     @Autowired
     private final VendaNotificador vendaNotificador;
@@ -29,47 +29,33 @@ public class VendaService {
     private VendaEventPublisher eventPublisher;
 
     public Page<Venda> findAll(Pageable pageable) {
-
-        return repository.findAll(pageable);
+        return vendaRepository.findAll(pageable);
     }
 
     public Venda save(Venda venda) {
-        Venda vendaSalva = repository.save(venda);
+        Venda vendaSalva = vendaRepository.save(venda);
 
         vendaNotificador.notificarNovaVenda(vendaSalva);
         return vendaSalva;
     }
 
     public Venda findById(Long id) {
-        return repository.findById(id)
+        return vendaRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Venda não encontrada com id: " + id));
     }
 
     public List<Venda> findByPeriodo(LocalDate inicio, LocalDate fim) {
-        return repository.findByDataBetween(inicio, fim);
+        return vendaRepository.findByDataBetween(inicio, fim);
     }
 
     public List<Venda> findByTipo(String tipo) {
-        return repository.findByTipo(tipo);
+        return vendaRepository.findByTipo(tipo);
     }
 
     public List<Venda> findByProduto(String nomeProduto) {
-        return repository.findByNomeProdutoContainingIgnoreCase(nomeProduto);
+        return vendaRepository.findByNomeProdutoContainingIgnoreCase(nomeProduto);
     }
 
-    /**
-     * Persiste a venda, calcula os campos derivados e notifica os observers.
-     * Ordem: calcular → salvar → notificar (observers recebem a venda com id).
-     */
-   /* public Venda save(Venda venda) {
-        calcularCampos(venda);
-        Venda salva = repository.save(venda);
-
-        // Padrão Observer: notifica todos os observers registrados
-        eventPublisher.notificar(salva);
-
-        return salva;
-    }*/
 
     public Venda update(Long id, Venda data) {
         Venda venda = findById(id);
@@ -87,14 +73,14 @@ public class VendaService {
         venda.setImposto(data.getImposto());
         venda.setOperacional(data.getOperacional());
         calcularCampos(venda);
-        return repository.save(venda);
+        return vendaRepository.save(venda);
     }
 
     public void delete(Long id) {
-        if (!repository.existsById(id)) {
+        if (!vendaRepository.existsById(id)) {
             throw new ResourceNotFoundException("Venda não encontrada com id: " + id);
         }
-        repository.deleteById(id);
+        vendaRepository.deleteById(id);
     }
 
     // ── Lógica de cálculo ────────────────────────────────────────────────────

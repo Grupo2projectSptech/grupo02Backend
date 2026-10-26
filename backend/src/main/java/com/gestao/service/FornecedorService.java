@@ -4,6 +4,8 @@ import com.gestao.exception.ResourceNotFoundException;
 import com.gestao.model.Fornecedor;
 import com.gestao.repository.FornecedorRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import java.util.List;
 
@@ -11,23 +13,32 @@ import java.util.List;
 public class FornecedorService {
 
     @Autowired
-    private FornecedorRepository repository;
+    private final FornecedorRepository fornecedorRepository;
+
+    public FornecedorService(FornecedorRepository fornecedorRepository) {
+        this.fornecedorRepository = fornecedorRepository;
+    }
+
+    public Page<Fornecedor> listarPaginado(Pageable pageable) {
+        return fornecedorRepository.findAll(pageable);
+    }
+
 
     public List<Fornecedor> findAll() {
-        return repository.findAll();
+        return fornecedorRepository.findAll();
     }
 
     public List<Fornecedor> findAtivos() {
-        return repository.findByAtivoTrue();
+        return fornecedorRepository.findByAtivoTrue();
     }
 
     public Fornecedor findById(Long id) {
-        return repository.findById(id)
+        return fornecedorRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Fornecedor não encontrado com id: " + id));
     }
 
     public Fornecedor save(Fornecedor fornecedor) {
-        return repository.save(fornecedor);
+        return fornecedorRepository.save(fornecedor);
     }
 
     public Fornecedor update(Long id, Fornecedor data) {
@@ -42,13 +53,13 @@ public class FornecedorService {
         fornecedor.setEstado(data.getEstado());
         fornecedor.setCategoria(data.getCategoria());
         fornecedor.setAtivo(data.isAtivo());
-        return repository.save(fornecedor);
+        return fornecedorRepository.save(fornecedor);
     }
 
     public void delete(Long id) {
-        if (!repository.existsById(id)) {
+        if (!fornecedorRepository.existsById(id)) {
             throw new ResourceNotFoundException("Fornecedor não encontrado com id: " + id);
         }
-        repository.deleteById(id);
+        fornecedorRepository.deleteById(id);
     }
 }

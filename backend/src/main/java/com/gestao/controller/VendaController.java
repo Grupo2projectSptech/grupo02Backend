@@ -24,7 +24,11 @@ import java.util.List;
 public class VendaController {
 
     @Autowired
-    private VendaService service;
+    private final VendaService service;
+
+    public VendaController(VendaService service) {
+        this.service = service;
+    }
 
     @GetMapping
     @Operation(summary = "Lista todas as vendas")

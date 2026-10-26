@@ -4,6 +4,8 @@ import com.gestao.exception.ResourceNotFoundException;
 import com.gestao.model.Produto;
 import com.gestao.repository.ProdutoRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import java.util.List;
 
@@ -11,10 +13,18 @@ import java.util.List;
 public class ProdutoService {
 
     @Autowired
-    private ProdutoRepository repository;
+    private final ProdutoRepository repository;
 
     @Autowired
     private FornecedorService fornecedorService;
+
+    public ProdutoService(ProdutoRepository repository) {
+        this.repository = repository;
+    }
+
+    public Page<Produto> listarPaginado(Pageable pageable) {
+        return repository.findAll(pageable);
+    }
 
     public List<Produto> findAll() {
         return repository.findAll();
