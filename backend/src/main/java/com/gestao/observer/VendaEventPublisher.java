@@ -1,29 +1,35 @@
 package com.gestao.observer;
 
 import com.gestao.model.Venda;
+import com.gestao.service.VendaNotificador;
+import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * Publisher / Subject do padrão Observer (GoF).
- *
- * Mantém a lista de {@link VendaObserver}s registrados e os notifica
- * sempre que uma venda é registrada no sistema.
- *
- * Os observers são injetados automaticamente pelo Spring via
- * {@link #registrar(VendaObserver)} chamado em cada implementação
- * anotada com {@code @Component}.
- */
+
 @Component
-public class VendaEventPublisher {
+@RequiredArgsConstructor
+public class VendaEventPublisher implements VendaNotificador {
 
     private static final Logger log = LoggerFactory.getLogger(VendaEventPublisher.class);
 
     private final List<VendaObserver> observers = new ArrayList<>();
+
+    private final RabbitTemplate rabbitTemplate;
+
+    @Value("${broker.exchange.venda}")
+    private String exchangeVenda;
+
+    public void publicarVendaRealizada(Venda venda) {
+        rabbitTemplate.convertAndSend(exchangeVenda, "", venda);
+        System.out.println("Venda publicada no RabbitMQ: ID " + venda.getId() + "Enviada para a Exchange " + exchangeVenda);
+    }
 
     /** Registra um observador para receber eventos de venda. */
     public void registrar(VendaObserver observer) {
@@ -52,5 +58,10 @@ public class VendaEventPublisher {
                         observer.getClass().getSimpleName(), ex.getMessage(), ex);
             }
         }
+    }
+
+    @Override
+    public void notificarNovaVenda(Venda venda) {
+
     }
 }

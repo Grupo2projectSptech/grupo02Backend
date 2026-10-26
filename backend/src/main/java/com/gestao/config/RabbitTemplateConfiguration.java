@@ -7,6 +7,7 @@ import org.springframework.amqp.core.Queue;
 import org.springframework.amqp.rabbit.connection.ConnectionFactory;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.amqp.support.converter.Jackson2JsonMessageConverter;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -34,24 +35,24 @@ public class RabbitTemplateConfiguration {
     }
 
     @Bean
-    public Queue estoquequeue() {
+    public Queue estoqueQueue() {
         return new Queue(queueEstoque, true);
     }
 
     @Bean
-    public Queue auditoriaqueue() {
+    public Queue auditoriaQueue() {
         return new Queue(queueAuditoria, true);
     }
 
     @Bean
-    public Binding bindingEstoque(Queue estoqueQueue, FanoutExchange vendaExchange) {
+    public Binding bindingEstoque(@Qualifier("estoqueQueue") Queue estoqueQueue, FanoutExchange vendaExchange) {
         return BindingBuilder
                 .bind(estoqueQueue)
                 .to(vendaExchange);
     }
 
     @Bean
-    public Binding bindingAuditoria(Queue auditoriaQueue, FanoutExchange vendaExchange) {return  BindingBuilder
+    public Binding bindingAuditoria(@Qualifier("auditoriaQueue") Queue auditoriaQueue, FanoutExchange vendaExchange) {return  BindingBuilder
                 .bind(auditoriaQueue)
                 .to(vendaExchange);
     }

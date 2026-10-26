@@ -4,7 +4,10 @@ import com.gestao.exception.ResourceNotFoundException;
 import com.gestao.model.Venda;
 import com.gestao.observer.VendaEventPublisher;
 import com.gestao.repository.VendaRepository;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
@@ -13,16 +16,28 @@ import java.time.LocalDate;
 import java.util.List;
 
 @Service
+@RequiredArgsConstructor
 public class VendaService {
 
     @Autowired
-    private VendaRepository repository;
+    private final VendaRepository repository;
+
+    @Autowired
+    private final VendaNotificador vendaNotificador;
 
     @Autowired
     private VendaEventPublisher eventPublisher;
 
-    public List<Venda> findAll() {
-        return repository.findAll();
+    public Page<Venda> findAll(Pageable pageable) {
+
+        return repository.findAll(pageable);
+    }
+
+    public Venda save(Venda venda) {
+        Venda vendaSalva = repository.save(venda);
+
+        vendaNotificador.notificarNovaVenda(vendaSalva);
+        return vendaSalva;
     }
 
     public Venda findById(Long id) {
@@ -46,7 +61,7 @@ public class VendaService {
      * Persiste a venda, calcula os campos derivados e notifica os observers.
      * Ordem: calcular → salvar → notificar (observers recebem a venda com id).
      */
-    public Venda save(Venda venda) {
+   /* public Venda save(Venda venda) {
         calcularCampos(venda);
         Venda salva = repository.save(venda);
 
@@ -54,7 +69,7 @@ public class VendaService {
         eventPublisher.notificar(salva);
 
         return salva;
-    }
+    }*/
 
     public Venda update(Long id, Venda data) {
         Venda venda = findById(id);
